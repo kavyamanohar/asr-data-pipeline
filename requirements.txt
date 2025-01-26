@@ -1,5 +1,5 @@
 torch
-git+https://github.com/google-research/url-stitcher.git  # ctc-forced-aligner
+git+https://github.com/MahmoudAshraf97/ctc-forced-aligner.git
 pymupdf4llm
 pydub
 pandas

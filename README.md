@@ -9,15 +9,20 @@ Automated Speech Recognition (ASR) data processing pipeline for converting PDF t
 
 ## Project Structure
 ```
-asr-data-pipeline/
-├── data/
-│   ├── raw/
-│   └── processed/
-├── src/
-│   ├── pdf_processor.py
-│   └── ...
-├── main.py
-└── requirements.txt
+data/
+├── raw/
+│   ├── data1.pdf
+│   ├── data1.mp3
+│   ├── data2.pdf
+│   └── data2.mp3
+├── processed/
+│   ├── data1.md
+│   ├── data1.txt
+│   ├── data2.md
+│   ├── data2.txt
+│   └── srt/
+│       ├── data1.srt
+│       └── data2.srt
 ```
 
 ## Setup
@@ -29,7 +34,7 @@ asr-data-pipeline/
 Run `python main.py`
 
 ## TODO
-- [ ] Implement force alignment with ctc-forced-aligner
+- [ ] ctc-forced-aligner fails on cpu due to memory constratints. Find alternative.
 - [ ] Develop audio segmentation module
 - [ ] Create metadata generation script
 
