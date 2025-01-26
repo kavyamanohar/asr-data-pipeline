@@ -60,3 +60,7 @@ Run `python main.py`
 
 ## License
 MIT License
+
+## Documentation
+
+https://kavyamanohar.gitbook.io/court-room-asr
