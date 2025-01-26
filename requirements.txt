@@ -1,2 +1,5 @@
-pymupdf4llm==0.1.0
-
+torch
+git+https://github.com/google-research/url-stitcher.git  # ctc-forced-aligner
+pymupdf4llm
+pydub
+pandas
