@@ -39,4 +39,4 @@ Run `python main.py`
 - Python 3.8+
 
 ## License
-[Add your license here]
+MIT License
