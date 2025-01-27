@@ -3,4 +3,4 @@ git+https://github.com/MahmoudAshraf97/ctc-forced-aligner.git
 pymupdf4llm
 pydub
 pandas
-srt-3.5.3
+srt

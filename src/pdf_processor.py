@@ -91,6 +91,7 @@ def pdf_processing_pipeline(input_dir, output_markdown_dir, output_txt_dir):
 
     # Find all PDF files in the input directory
     pdf_files = glob.glob(os.path.join(input_dir, '*.pdf'))
+    print(pdf_files)
     
     if not pdf_files:
         logging.warning(f"No PDF files found in {input_dir}")

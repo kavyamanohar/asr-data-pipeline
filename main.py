@@ -24,19 +24,19 @@ def main():
     # Create required directories
     create_data_directories()
 
-    # # PDF Processing
-    # pdf_processing_pipeline(
-    #     input_dir="data/raw", 
-    #     output_markdown_dir="data/processed/markdown", 
-    #     output_txt_dir="data/processed/text"
-    # )
+    # PDF Processing
+    pdf_processing_pipeline(
+        input_dir="data/raw", 
+        output_markdown_dir="data/processed/markdown", 
+        output_txt_dir="data/processed/text"
+    )
 
-    # # Forced Alignment
-    # forced_alignment_pipeline(
-    #     text_dir="data/processed/text", 
-    #     audio_dir="data/raw", 
-    #     srt_dir="data/processed/srt"
-    # )
+    # Forced Alignment
+    forced_alignment_pipeline(
+        text_path="data/processed/text", 
+        audio_path="data/raw", 
+        output_srt_path="data/processed/srt"
+    )
 
     # Audio Slicing and Metadata Generation
     audio_slicing_pipeline(
