@@ -14,7 +14,7 @@ def create_data_directories():
         'data/processed/markdown',
         'data/processed/text',
         'data/processed/srt',
-        'data/processed/audio_segments'
+        'data/processed/corpus'
     ]
     for directory in directories:
         os.makedirs(directory, exist_ok=True)
@@ -33,17 +33,17 @@ def main():
 
     # Forced Alignment
     forced_alignment_pipeline(
-        text_path="data/processed/text", 
-        audio_path="data/raw", 
+        text_path="data/processed/text",
+        audio_path="data/raw",
         output_srt_path="data/processed/srt"
     )
 
     # Audio Slicing and Metadata Generation
     audio_slicing_pipeline(
-        audio_dir="data/raw", 
-        srt_dir="data/processed/srt", 
-        output_dir="data/processed/audio_segments",
-        metadata_path="data/processed/metadata.json"
+        audio_dir="data/raw",
+        srt_dir="data/processed/srt",
+        output_dir="data/processed/corpus",
+        metadata_path="data/processed/corpus/metadata.jsonl"
     )
 
 if __name__ == "__main__":
