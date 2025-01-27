@@ -4,6 +4,8 @@ import pymupdf4llm
 import re
 import pathlib
 import logging
+from sentencex import segment
+
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
 
@@ -32,14 +34,15 @@ def process_markdown(input_file, output_file):
     """
     try:
         with open(input_file, 'r', encoding='utf-8') as infile, open(output_file, 'w', encoding='utf-8') as outfile:
-            # Initialize a flag to track whether we've encountered "M IST"
-            found_mist = False
+            # Initialize a flag to track whether we've encountered "M IST" 
+            found_sot = False #Start of Transcription
+            lines = []
             for line in infile:
                 line = line.strip()
 
-                if not found_mist:
-                    if "M IST" in line:
-                        found_mist = True
+                if not found_sot:
+                    if "M IST" in line: # Start of Transcription begins with 9:00 AM IST
+                        found_sot = True
                     continue
 
                 # Remove lines starting with one or more '#'
@@ -65,10 +68,21 @@ def process_markdown(input_file, output_file):
                 match = re.match(r'^([A-Z0-9\.\s\']+):(.*)', line)
                 if match:
                     line = match.group(2)
-
-                # Write processed line
-                outfile.write(line.strip() + "\n")
+                    
+                # Combine processed lines
+                lines.append(line.strip())
+            all_text = ' '.join(lines)
+            # If using CTC-Forced Alignment, the text will be segmented by the FA tool (NLTK)
+            outfile.write(all_text) 
         
+
+            # # Segment all_text into sentences using sentences library and write to outfile. 
+            # # Use this for aeneas
+            # sentences = segment('en', all_text)
+            # for sentence in sentences:
+            #     outfile.write(sentence + "\n")
+
+
         logging.info(f"Processed markdown file: {output_file}")
     
     except FileNotFoundError:
