@@ -4,3 +4,5 @@ pymupdf4llm
 pydub
 pandas
 srt
+sentencex
+datasets
