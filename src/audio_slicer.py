@@ -25,7 +25,6 @@ def slice_audio(audio_path, srt_path, output_dir, metadata):
     audio = AudioSegment.from_mp3(audio_path)
     segments = parse_srt(srt_path)
     base_filename = os.path.splitext(os.path.basename(audio_path))[0]
-    
     for i, segment in enumerate(segments, 1):
         try:
             # Slice audio segment
@@ -37,7 +36,7 @@ def slice_audio(audio_path, srt_path, output_dir, metadata):
             
             # Collect metadata
             metadata.append({
-                'filename': f"{base_filename}-{i}.wav",
+                'file_name': f"{base_filename}-{i}.wav",
                 'transcript': segment['text'].strip()
             })
             
@@ -47,15 +46,14 @@ def slice_audio(audio_path, srt_path, output_dir, metadata):
             logging.error(f"Failed to slice segment {i}: {e}")
 
 def audio_slicing_pipeline(audio_dir, srt_dir, output_dir, metadata_path):
-    """Process all audio files and generate metadata"""
+    """Process all audio files and generate metadata in JSONL format"""
     os.makedirs(output_dir, exist_ok=True)
-    
     metadata = []
     
+    # Process audio files and collect metadata
     for srt_filename in os.listdir(srt_dir):
         if srt_filename.endswith('.srt'):
             base_filename = os.path.splitext(srt_filename)[0]
-            
             audio_path = os.path.join(audio_dir, f"{base_filename}.mp3")
             srt_path = os.path.join(srt_dir, srt_filename)
             
@@ -64,9 +62,11 @@ def audio_slicing_pipeline(audio_dir, srt_dir, output_dir, metadata_path):
             else:
                 logging.warning(f"No audio file found for {srt_filename}")
     
-    # Write metadata to JSON
+    # Write metadata to JSONL file - each entry on a new line
     with open(metadata_path, 'w', encoding='utf-8') as f:
-        json.dump(metadata, f, indent=2)
+        for entry in metadata:
+            json_line = json.dumps(entry)  # Convert dictionary to JSON string
+            f.write(json_line + '\n')  # Write each entry with newline
     
     logging.info(f"Metadata saved to {metadata_path}")
 
@@ -75,6 +75,6 @@ if __name__ == "__main__":
     audio_slicing_pipeline(
         audio_dir="data/raw", 
         srt_dir="data/processed/srt", 
-        output_dir="data/processed/audio_segments",
-        metadata_path="data/processed/metadata.json"
+        output_dir="data/processed/corpus",
+        metadata_path="data/processed/corpus/metadata.jsonl"
     )
