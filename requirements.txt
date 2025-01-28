@@ -6,3 +6,4 @@ pandas
 srt
 sentencex
 datasets
+huggingface-hub

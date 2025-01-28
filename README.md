@@ -5,7 +5,10 @@ Automated Speech Recognition (ASR) data processing pipeline for converting PDF t
 
 ## Current Status
 - PDF to text conversion implemented
-- Basic text cleaning completed
+- Basic text cleaning completed, with optional sentence segmentation 
+- Forced Alignment with CTC to get srt files
+    - srt files are not a mandatory requirement. But if srt files are available from a third party source, this pipeline would be useful.
+- Slice the audio based on the start and end segment information from srt files and create a metadata.jsonl file for pushing to huggingface hub.
 
 ## Project Structure
 ```
@@ -30,12 +33,13 @@ asr-data-pipeline/
 │       ├── srt/
 │       │   ├── data1.srt
 │       │   └── data2.srt
-│       ├── audio_segments/
-│       │   ├── data1-1.wav
-│       │   ├── data1-2.wav
-│       │   └── data2-1.wav
-│       └── metadata.json
+│       ├── corpus/
+│          ├── data1-1.wav
+│          ├── data1-2.wav
+│          ├── data2-1.wav
+│          └── metadata.jsonl
 ├── main.py
+├── push_tohub.py
 ├── README
 ├── LICENSE
 └── requirements.txt
@@ -56,7 +60,10 @@ Run `python main.py`
 - pymupdf4llm
 - srtsrt-3.5.3
 - pydub
-- Python 3.8+
+- sentencex
+- huggingface-hub
+- datasets
+
 
 ## License
 MIT License

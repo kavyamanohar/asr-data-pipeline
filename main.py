@@ -24,7 +24,7 @@ def main():
     # Create required directories
     create_data_directories()
 
-    # PDF Processing
+    # PDF Processing to (sentence segmented) text
     pdf_processing_pipeline(
         input_dir="data/raw", 
         output_markdown_dir="data/processed/markdown", 
