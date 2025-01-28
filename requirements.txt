@@ -1,9 +1,3 @@
-torch
-git+https://github.com/MahmoudAshraf97/ctc-forced-aligner.git
 pymupdf4llm
-pydub
-pandas
-srt
 sentencex
-datasets
-huggingface-hub
+llama_index

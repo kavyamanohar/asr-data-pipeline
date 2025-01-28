@@ -1,4 +1,4 @@
-# ASR Data Processing Pipeline
+# PDF to Text Processing Pipeline
 
 ## Project Overview
 Automated Speech Recognition (ASR) data processing pipeline for converting PDF transcripts and audio files into aligned, segmented data.
@@ -14,32 +14,16 @@ Automated Speech Recognition (ASR) data processing pipeline for converting PDF t
 ```
 asr-data-pipeline/
 ├── src/
-│   ├── pdf_processor.py
-│   ├── forced_aligner.py
-│   └── audio_slicer.py
+│   ├── pdf_extractor.py
 ├── data/
 │   ├── raw/
 │   │   ├── data1.pdf
-│   │   ├── data1.mp3
 │   │   ├── data2.pdf
-│   │   └── data2.mp3
 │   └── processed/
-│       ├── markdown/
-│       │   ├── data1.md
-│       │   └── data2.md
 │       ├── text/
-│       │   ├── data1.txt
-│       │   └── data2.txt
-│       ├── srt/
-│       │   ├── data1.srt
-│       │   └── data2.srt
-│       ├── corpus/
-│          ├── data1-1.wav
-│          ├── data1-2.wav
-│          ├── data2-1.wav
-│          └── metadata.jsonl
+│         ├── data1.txt
+│         └── data2.txt
 ├── main.py
-├── push_tohub.py
 ├── README
 ├── LICENSE
 └── requirements.txt
@@ -54,18 +38,17 @@ asr-data-pipeline/
 Run `python main.py`
 
 ## TODO
-- [ ] ctc-forced-aligner fails on cpu due to memory constratints. Find alternative.
+3. Sentence segmentation
+1. Text normalization
+2. Punctuation Removal
 
 ## Dependencies
 - pymupdf4llm
-- srtsrt-3.5.3
-- pydub
 - sentencex
-- huggingface-hub
-- datasets
-
+- llama_index
 
 ## License
+
 MIT License
 
 ## Documentation
