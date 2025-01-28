@@ -22,25 +22,11 @@ def main():
 
     # PDF Processing to (sentence segmented) text
     pdf_processing_pipeline(
-        input_dir="data/raw", 
-        # output_markdown_dir="data/processed/markdown", 
+        input_dir="data/raw",
+        output_markdown_dir="data/processed/markdown",
         output_txt_dir="data/processed/text"
     )
 
-    # # Forced Alignment
-    # forced_alignment_pipeline(
-    #     text_path="data/processed/text",
-    #     audio_path="data/raw",
-    #     output_srt_path="data/processed/srt"
-    # )
-
-    # # Audio Slicing and Metadata Generation
-    # audio_slicing_pipeline(
-    #     audio_dir="data/raw",
-    #     srt_dir="data/processed/srt",
-    #     output_dir="data/processed/corpus",
-    #     metadata_path="data/processed/corpus/metadata.jsonl"
-    # )
 
 if __name__ == "__main__":
     main()

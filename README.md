@@ -45,7 +45,6 @@ Run `python main.py`
 ## Dependencies
 - pymupdf4llm
 - sentencex
-- llama_index
 
 ## License
 

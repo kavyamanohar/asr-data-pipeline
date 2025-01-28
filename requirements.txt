@@ -1,3 +1,2 @@
 pymupdf4llm
 sentencex
-llama_index
