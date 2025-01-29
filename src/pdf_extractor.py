@@ -23,6 +23,40 @@ def convert_pdf_to_markdown(input_pdf, output_markdown):
         logging.info(f"Converted {input_pdf} to markdown: {output_markdown}")
     except Exception as e:
         logging.error(f"Failed to convert {input_pdf}: {e}")
+      
+def combine_short_sentences(sentences, min_words=7):
+    processed_sentences = []
+    current_segment = ""
+    
+    for sentence in sentences:
+        sentence = sentence.lower()
+        
+        # If we have a current segment, combine it with the new sentence
+        if current_segment:
+            combined = current_segment + " " + sentence
+        else:
+            combined = sentence
+            
+        # Count words in combined segment
+        word_count = len(combined.split())
+        
+        # If we have enough words, add to processed sentences and reset
+        if word_count >= min_words:
+            processed_sentences.append(combined)
+            current_segment = ""
+        else:
+            current_segment = combined
+    
+    # Don't miss any remaining segment
+    if current_segment:
+        # If we have a last incomplete segment, append it to the last processed sentence
+        if processed_sentences:
+            processed_sentences[-1] = processed_sentences[-1] + " " + current_segment
+        else:
+            processed_sentences.append(current_segment)
+    
+    return processed_sentences
+
 
 def process_markdown(input_file, output_file):
     """
@@ -48,12 +82,15 @@ def process_markdown(input_file, output_file):
                 # Remove lines starting with one or more '#'
                 line = re.sub(r'^#+', '', line).strip()
 
-                # Remove specific unwanted text
-                line = line.replace("Transcribed by TERES", "")
                 # Remove lines with "END OF ... PROCEEDINGS"
                 if re.search(r'END OF.*PROCEEDING*', line, re.IGNORECASE):
                     continue
-
+                
+                if re.search(r'Transcribed by TERES', line, re.IGNORECASE):
+                    continue
+                
+                if '|' in line:
+                    continue
                 # Remove line numbers
                 line = re.sub(r'^\s*\d+\s*', '', line)
 
@@ -63,6 +100,9 @@ def process_markdown(input_file, output_file):
                 # Skip empty lines
                 if not line:
                     continue
+                
+                # Remove content inside square brackets
+                line = re.sub(r'\[.*?\]', '', line).strip()
 
                 # Remove content before colon if it's all uppercase with additional characters
                 match = re.match(r'^([A-Z0-9\.\s\']+):(.*)', line)
@@ -80,11 +120,12 @@ def process_markdown(input_file, output_file):
             # # Segment all_text into sentences using sentences library and write to outfile. 
             # # Use this for aeneas
             all_text = ' '.join(lines)
+            matches = re.findall(r'\[(.*?)\]', all_text)
+            print(matches)
             sentences = segment('en', all_text)
-            for sentence in sentences:
-                sentence = sentence.lower()
+            processed_sentences = combine_short_sentences(sentences, min_words=7)
+            for sentence in processed_sentences:
                 outfile.write(sentence + "\n")
-
 
         logging.info(f"Processed markdown file: {output_file}")
     
