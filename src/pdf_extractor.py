@@ -24,7 +24,7 @@ def convert_pdf_to_markdown(input_pdf, output_markdown):
     except Exception as e:
         logging.error(f"Failed to convert {input_pdf}: {e}")
       
-def split_segment(sentence, max_words=30):
+def split_segment(sentence, max_words=15):
     words = sentence.split()
     total_words = len(words)
     
@@ -64,7 +64,7 @@ def split_segment(sentence, max_words=30):
     
     return final_parts
 
-def process_sentences(sentences, min_words=7, max_words=30):
+def process_sentences(sentences, min_words=7, max_words=15):
     processed_sentences = []
     current_segment = ""
     
@@ -178,7 +178,7 @@ def process_markdown(input_file, output_file):
             text = re.sub(r'\.+', '.', all_text).replace('"', ' ')
             processed_text = re.sub(r'\s+', ' ', text)
             sentences = segment('en', processed_text)
-            processed_sentences = process_sentences(sentences, min_words=7, max_words=30)
+            processed_sentences = process_sentences(sentences, min_words=7, max_words=15)
             for sentence in processed_sentences:
                 outfile.write(sentence + "\n")
 
