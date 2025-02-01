@@ -24,34 +24,89 @@ def convert_pdf_to_markdown(input_pdf, output_markdown):
     except Exception as e:
         logging.error(f"Failed to convert {input_pdf}: {e}")
       
-def combine_short_sentences(sentences, min_words=7):
+def split_segment(sentence, max_words=30):
+    words = sentence.split()
+    total_words = len(words)
+    
+    # If sentence is within limit, return as is
+    if total_words <= max_words:
+        return [sentence]
+    
+    # Calculate how many parts we need
+    num_parts = (total_words + max_words - 1) // max_words  # Round up division
+    target_length = total_words // num_parts
+    
+    parts = []
+    current_part = []
+    word_count = 0
+    
+    for word in words:
+        current_part.append(word)
+        word_count += 1
+        
+        # When we reach target length and we haven't created all parts yet
+        if word_count >= target_length and len(parts) < num_parts - 1:
+            parts.append(" ".join(current_part))
+            current_part = []
+            word_count = 0
+    
+    # Add remaining words to the last part
+    if current_part:
+        parts.append(" ".join(current_part))
+    
+    # Verify no part exceeds max_words and split further if needed
+    final_parts = []
+    for part in parts:
+        if len(part.split()) > max_words:
+            final_parts.extend(split_segment(part, max_words))
+        else:
+            final_parts.append(part)
+    
+    return final_parts
+
+def process_sentences(sentences, min_words=7, max_words=30):
     processed_sentences = []
     current_segment = ""
     
     for sentence in sentences:
         sentence = sentence.lower()
         
-        # If we have a current segment, combine it with the new sentence
+        # First handle the combination with current segment if it exists
         if current_segment:
             combined = current_segment + " " + sentence
         else:
             combined = sentence
             
-        # Count words in combined segment
         word_count = len(combined.split())
         
+        # If the combined segment is too long, split it
+        if word_count > max_words:
+            # First, clear any current segment by adding it to processed sentences
+            if current_segment:
+                processed_sentences.append(current_segment)
+                current_segment = ""
+            # Then split the current sentence into appropriate parts
+            split_parts = split_segment(sentence, max_words)
+            processed_sentences.extend(split_parts)
+            
         # If we have enough words, add to processed sentences and reset
-        if word_count >= min_words:
+        elif word_count >= min_words:
             processed_sentences.append(combined)
             current_segment = ""
+            
         else:
             current_segment = combined
     
-    # Don't miss any remaining segment
+    # Handle any remaining segment
     if current_segment:
-        # If we have a last incomplete segment, append it to the last processed sentence
         if processed_sentences:
-            processed_sentences[-1] = processed_sentences[-1] + " " + current_segment
+            # Check if adding to the last sentence would exceed max_words
+            last_sentence = processed_sentences[-1]
+            combined = last_sentence + " " + current_segment
+            if len(combined.split()) > max_words:
+                processed_sentences.append(current_segment)
+            else:
+                processed_sentences[-1] = combined
         else:
             processed_sentences.append(current_segment)
     
@@ -120,10 +175,10 @@ def process_markdown(input_file, output_file):
             # # Segment all_text into sentences using sentences library and write to outfile. 
             # # Use this for aeneas
             all_text = ' '.join(lines)
-            matches = re.findall(r'\[(.*?)\]', all_text)
-            print(matches)
-            sentences = segment('en', all_text)
-            processed_sentences = combine_short_sentences(sentences, min_words=7)
+            text = re.sub(r'\.+', '.', all_text).replace('"', ' ')
+            processed_text = re.sub(r'\s+', ' ', text)
+            sentences = segment('en', processed_text)
+            processed_sentences = process_sentences(sentences, min_words=7, max_words=30)
             for sentence in processed_sentences:
                 outfile.write(sentence + "\n")
 
