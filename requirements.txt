@@ -1,2 +1,2 @@
 pymupdf4llm
-sentencex
+nemo_text_processing
