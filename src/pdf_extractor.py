@@ -4,8 +4,8 @@ import pymupdf4llm
 import re
 import pathlib
 import logging
-from sentencex import segment
-
+import nemo_text_processing
+from nemo_text_processing.text_normalization.normalize import Normalizer
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
 
@@ -34,83 +34,27 @@ def split_segment(sentence, max_words=15):
     
     # Calculate how many parts we need
     num_parts = (total_words + max_words - 1) // max_words  # Round up division
-    target_length = total_words // num_parts
     
     parts = []
-    current_part = []
-    word_count = 0
+    for i in range(0, total_words, max_words):
+        part = " ".join(words[i:i+max_words])
+        parts.append(part)
     
-    for word in words:
-        current_part.append(word)
-        word_count += 1
-        
-        # When we reach target length and we haven't created all parts yet
-        if word_count >= target_length and len(parts) < num_parts - 1:
-            parts.append(" ".join(current_part))
-            current_part = []
-            word_count = 0
-    
-    # Add remaining words to the last part
-    if current_part:
-        parts.append(" ".join(current_part))
-    
-    # Verify no part exceeds max_words and split further if needed
-    final_parts = []
-    for part in parts:
-        if len(part.split()) > max_words:
-            final_parts.extend(split_segment(part, max_words))
-        else:
-            final_parts.append(part)
-    
-    return final_parts
+    return parts
 
-def process_sentences(sentences, min_words=7, max_words=15):
-    processed_sentences = []
-    current_segment = ""
-    
-    for sentence in sentences:
-        sentence = sentence.lower()
-        
-        # First handle the combination with current segment if it exists
-        if current_segment:
-            combined = current_segment + " " + sentence
-        else:
-            combined = sentence
-            
-        word_count = len(combined.split())
-        
-        # If the combined segment is too long, split it
-        if word_count > max_words:
-            # First, clear any current segment by adding it to processed sentences
-            if current_segment:
-                processed_sentences.append(current_segment)
-                current_segment = ""
-            # Then split the current sentence into appropriate parts
-            split_parts = split_segment(sentence, max_words)
-            processed_sentences.extend(split_parts)
-            
-        # If we have enough words, add to processed sentences and reset
-        elif word_count >= min_words:
-            processed_sentences.append(combined)
-            current_segment = ""
-            
-        else:
-            current_segment = combined
-    
-    # Handle any remaining segment
-    if current_segment:
-        if processed_sentences:
-            # Check if adding to the last sentence would exceed max_words
-            last_sentence = processed_sentences[-1]
-            combined = last_sentence + " " + current_segment
-            if len(combined.split()) > max_words:
-                processed_sentences.append(current_segment)
-            else:
-                processed_sentences[-1] = combined
-        else:
-            processed_sentences.append(current_segment)
-    
-    return processed_sentences
+def process_sentences(sentences, max_words=15):
+   processed_sentences = []
+   for sentence in sentences:
+       sentence = sentence.lower()
+       words = sentence.split()
+       
+       # Split long sentences, keep short sentences
+       if len(words) > max_words:
+           processed_sentences.extend(split_segment(sentence, max_words))
+       else:
+           processed_sentences.append(sentence)
+   
+   return processed_sentences
 
 
 def process_markdown(input_file, output_file):
@@ -166,19 +110,15 @@ def process_markdown(input_file, output_file):
                     
                 # Combine processed lines
                 lines.append(line.strip())
-            # If using CTC-Forced Alignment, the text will be segmented by the FA tool (NLTK)
-            # all_text = '\n'.join(lines)
-            # all_text = all_text.lower()
-            # outfile.write(all_text) 
-        
 
-            # # Segment all_text into sentences using sentences library and write to outfile. 
-            # # Use this for aeneas
             all_text = ' '.join(lines)
-            text = re.sub(r'\.+', '.', all_text).replace('"', ' ')
+            text = re.sub(r'\.+', '.', all_text).replace('"', ' ').replace('…', '.')
             processed_text = re.sub(r'\s+', ' ', text)
-            sentences = segment('en', processed_text)
-            processed_sentences = process_sentences(sentences, min_words=7, max_words=15)
+            normalizer = Normalizer(input_case='cased', lang='en')
+            sentences = normalizer.split_text_into_sentences(processed_text)
+            normalized_sentences = normalizer.normalize_list(sentences)
+            processed_sentences = process_sentences(normalized_sentences, max_words=15)
+
             for sentence in processed_sentences:
                 outfile.write(sentence + "\n")
 
@@ -218,7 +158,7 @@ def pdf_processing_pipeline(input_dir, output_markdown_dir, output_txt_dir):
 
         # Convert PDF to markdown
         convert_pdf_to_markdown(pdf_path, markdown_output)
-        
+
         # Process markdown to text
         process_markdown(markdown_output, txt_output)
 
