@@ -48,7 +48,7 @@ Run `python main.py`
 
 ## Dependencies
 - pymupdf4llm
-- sentencex
+- nemo_text_processing
 
 ## License
 
