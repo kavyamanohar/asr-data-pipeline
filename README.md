@@ -43,7 +43,7 @@ Run `python main.py`
 
 ## TODO
 
-1. Text normalization
+1. Improved Text normalization
 2. Punctuation Removal
 
 ## Dependencies
